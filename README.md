@@ -1,6 +1,4 @@
-[![Gem Version](https://badge.fury.io/rb/ripar.png)](http://badge.fury.io/rb/ripar)
-
-# Ripar
+# Ripar [![Gem Version](https://badge.fury.io/rb/ripar.png)](http://badge.fury.io/rb/ripar) [![Build Status](https://travis-ci.org/djellemah/ripar.png?branch=master)](https://travis-ci.org/djellemah/ripar)
 
 Think riparian. Think old man river, he jus' keep on rollin'. Think
 [rive](http://etymonline.com/index.php?search=rive). Also river, reaver,
