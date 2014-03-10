@@ -1,8 +1,10 @@
+[![Gem Version](https://badge.fury.io/rb/ripar.png)](http://badge.fury.io/rb/ripar)
+
 # Ripar
 
-Think riparian. Think old man river, he jus' keep on rollin'
-
-[rive](http://etymonline.com/index.php?search=rive)
+Think riparian. Think old man river, he jus' keep on rollin'. Think
+[rive](http://etymonline.com/index.php?search=rive). Also river, reaver,
+repair, reaper.
 
 Tear chained method calls apart, put them in a block, and return the block value. eg
 
@@ -20,7 +22,7 @@ After:
   end
 ```
 
-Why is this different to instance_eval? Because the following will work:
+This is also a little different to instance_eval, because the following will work:
 
 ``` ruby
   outside_block_regex = /Wahoody-hey/
@@ -33,9 +35,33 @@ Why is this different to instance_eval? Because the following will work:
 ```
 
 **Warning** this can have some rare but weird side effects:
-  - will break on classes that have defined method_missing, but not respond_to_missing
+  - will probably break on classes that have defined method_missing, but not respond_to_missing
   - an outside variable with the same name as an inside method
     taking in-place hash argument will cause a syntax error.
+
+But you can obviate all of that by just using the safe syntax:
+
+``` ruby
+  outside_block_regex = /Wahoody-hey/
+
+  result = values.rive do |vs|
+    vs.select{|x| x.name =~ outside_block_regex}
+    vs.map{|x| x.count}
+    vs.inject(0){|s,x| s + x}
+  end
+```
+
+Or using the magic disambiguaters:
+
+``` ruby
+  select = /Wahoody-hey/
+
+  result = values.rive do
+    __inside__.select{|x| x.name =~ __outside__.select}
+    map{|x| x.count}
+    inject(0){|s,x| s + x}
+  end
+```
 
 ## Installation
 
@@ -59,7 +85,7 @@ class YourChainableThing
   include Ripar
 end
 
-yct = YourChainableThing.new.ripar do
+yct = YourChainableThing.new.rive do
   # operations
 end
 ```
@@ -88,3 +114,15 @@ The standard github pull request dance:
   1. Commit your changes (`git commit -am 'Add some feature'`)
   1. Push to the branch (`git push origin my-new-feature`)
   1. Create new Pull Request
+
+## PS
+```ruby
+Thing = Struct.new :name, :count
+values = [
+  Thing.new('John', 20),
+  Thing.new('Joe', 7),
+  Thing.new('Paul', 3),
+  Thing.new('James', 3),
+  Thing.new('Wahoody-heydi-dude', 3.141527),
+]
+```
