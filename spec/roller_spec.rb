@@ -24,8 +24,19 @@ describe Ripar::Roller do
     7
   end
 
-  it 'returns an instance' do
+  it 'returns an instance immediately' do
+    rvs = collection.rive do
+      reverse
+    end
+
+    rvs.should_not be_respond_to(:__class__)
+    rvs.should be_a(Array)
+    collection.should == rvs.reverse
+  end
+
+  it 'riven returns an instance' do
     rlr = collection.roller
+    rlr.riven.should_not be_respond_to(:__class__)
     rlr.riven.should be_a(collection.class)
   end
 
@@ -38,6 +49,15 @@ describe Ripar::Roller do
     rlr = collection.roller do |rlr|
       rlr.original.should be_a(Array)
     end
+  end
+
+  it 'applies a 1 arg block' do
+    evens = collection.rive do |vs|
+      vs.select{|x| even(x)}
+    end
+
+    evens.should be_a(Array)
+    evens.should == [2,4,6,8]
   end
 
   # And this is the really important one
@@ -76,12 +96,12 @@ describe Ripar::Roller do
     rlr.riven.should == [1]
   end
 
-  it '(...) will force inside method call' do
+  it '(...) will force inside method call and ignore outside local variable' do
     delete = 'doggone'
     rlr = collection.roller do
-      delete 2
+      delete(2)
     end
-    rlr.riven.should == [1,3,4,5,6,7,8]
+    rlr.riven.should == 2
   end
 
   it '() will force inside method call' do
@@ -175,18 +195,65 @@ describe Ripar::Roller do
   end
 
   describe 'ambiguous method' do
-    def at( *args )
+    def to_be_duplicated
     end
 
-    it 'raises on duplicate method' do
-      lambda do
-        rlr = collection.roller do
-          at(3)
+    it 'handles non-nested ambiguity' do
+      class << collection
+        def to_be_duplicated
+          require 'pry'; binding.pry
+          flat_map{|x| [x,x]}
         end
-      end.should raise_error(/ambiguous/)
+      end
+
+      ->{collection.roller{ to_be_duplicated }}.should raise_error(Ripar::Combinder::AmbiguousMethod)
     end
 
-    it 'Combinder calls ambiguous_method'
-    it 'handles inside/outside both'
+    it 'handles nested rollers' do
+      class << collection
+        def square_evens
+          roller do
+            select &:even?
+            map{|x| x ** 2}
+          end
+        end
+      end
+
+      collection.square_evens.riven.should == [4,16,36,64]
+
+      squares_doubled = collection.roller do
+        square_evens
+        self * 2
+      end
+
+      squares_doubled.inspect.should =~ /Roller/
+      squares_doubled.riven.should == [4,16,36,64] * 2
+      squares_doubled.roller{count}.should == 8
+
+      # TODO this should really be elsewhere
+      squares_doubled.riven.should == 8
+    end
+  end
+
+  describe '#roller' do
+    it 'returns self with no block' do
+      rlr = collection.roller
+      rlr.__class__.should == Ripar::Roller
+      rlr.__object_id__.should == rlr.roller.__object_id__
+    end
+  end
+
+  describe '#inspect' do
+    it 'has class name' do
+      collection.roller.inspect.should =~ /Ripar::Roller/
+    end
+
+    it 'has original' do
+      collection.roller.original.should == collection
+    end
+
+    it 'has riven' do
+      collection.roller.riven.object_id.should_not == collection.object_id
+    end
   end
 end

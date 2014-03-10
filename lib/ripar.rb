@@ -5,8 +5,10 @@ require "ripar/roller"
 # would have been chained in the block.
 module Ripar
   # return the final value
+  # short, unique, unlikely to clash with other methods in Object
+  # if you want to monkey-patch.
   def rive( &block )
-    Roller.new( self, &block ).riven
+    Roller.rive self, &block
   end
 
   # return the roller object containing the final value

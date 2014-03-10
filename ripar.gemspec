@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-debundle"
   spec.add_development_dependency "pry-debugger"
+  spec.add_development_dependency "simplecov"
 end
