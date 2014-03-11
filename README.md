@@ -96,6 +96,11 @@ class << o
 end
 ```
 
+The mostest lightweightiest
+``` ruby
+o = Object.new.extend(Ripar)
+```
+
 Monkey-patch
 ``` ruby
 class Object
