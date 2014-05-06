@@ -7,7 +7,7 @@ require 'ripar/combinder.rb'
 class Ripar::Roller < BasicObject
   def initialize( original, &block )
     @original = original
-    # clone is for protection or original - not strictly necessary?
+    # clone is for protection of original - not strictly necessary?
     @riven = original.clone
     roll_block( &block ) if block
   end
