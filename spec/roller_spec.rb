@@ -121,14 +121,26 @@ describe Ripar::Roller do
 
   it 'syntax error for outside variable and inside method call in-place hash syntax' do
     multiply = 'go forth and'
-    rlr = collection.roller do
-      pending "Not possible for in-place hash syntax"
-      # This will cause a syntax error because the interpreter
-      # finds the outside variable, and we're trying to call a method.
-      # but only if we're using the in-place hash syntax
-      # multiply factor: 3
-    end
-    rlr.riven.should == [3,6,9,12,15,18,21,24]
+    # This will cause a syntax error because the interpreter
+    # finds the outside variable, and we're trying to call a method.
+    # but only if we're using the in-place hash syntax
+    lambda do
+      eval <<-EOS
+      rlr = collection.roller do
+        multiply factor: 3
+      end
+      EOS
+    end.should raise_error(SyntaxError, /unexpected ':'/)
+  end
+
+  # counter-case for previous example
+  it 'eval outside variable and inside method call in-place hash syntax' do
+    multiply = 'go forth and'
+    begin
+      rlr = collection.roller do
+        eval "multiply factor: 3"
+      end
+    end.riven.should == [3,6,9,12,15,18,21,24]
   end
 
   it 'in-place hash syntax with name clash ok with (...)' do
@@ -201,7 +213,6 @@ describe Ripar::Roller do
     it 'handles non-nested ambiguity' do
       class << collection
         def to_be_duplicated
-          require 'pry'; binding.pry
           flat_map{|x| [x,x]}
         end
       end
