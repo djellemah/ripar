@@ -53,20 +53,14 @@ class Ripar::Roller < BasicObject
     new( original, &block ).riven
   end
 
-  # Forward to riven, if the method exists.
+  # Forward to riven, let it raise a method missing exception if necessary
   def method_missing(meth, *args, &block)
-    if @riven.respond_to? meth
-      interim = @riven.send( meth, *args, &block )
-      # ::Kernel.puts "sending #{meth}(#{args.inspect}) to #{@riven.inspect}: #{interim}"
-      @riven = interim
-    else
-      super
-    end
+    @riven = @riven.send( meth, *args, &block )
   end
 
   # used by combinder, so must be defined, otherwise it perturbs method_missing
   def send( meth, *args, &block )
-    method_missing( meth, *args, &block )
+    method_missing meth, *args, &block
   end
 
   # used by combinder, so must be defined, otherwise it perturbs method_missing
