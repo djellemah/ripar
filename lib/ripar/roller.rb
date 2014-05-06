@@ -12,6 +12,8 @@ class Ripar::Roller < BasicObject
     roll_block( &block ) if block
   end
 
+  class Undispatchable < ::RuntimeError; end
+
   # Callback from Combinder.
   #
   # This happens when the outside self is_a?(original.class) already,
@@ -28,9 +30,8 @@ class Ripar::Roller < BasicObject
       # send it to the roller
       send meth, *args, &blk
     else
-      # don't know what to do with it, so let Combinder raise an AmbiguousMethod
-      # TODO too much coupling because this class knows about Combinder internals.
-      raise ::NoMethodError, meth
+      # don't know what to do with it
+      raise Undispatchable, "don't know how to dispatch #{meth}"
     end
   end
 

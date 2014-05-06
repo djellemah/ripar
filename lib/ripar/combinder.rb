@@ -33,7 +33,13 @@ class Ripar::Combinder < BasicObject
       begin
         return @obj.__ambiguous_method__( @binding.self, meth, *args, &blk )
       rescue ::NoMethodError => ex
-        ::Kernel.raise AmbiguousMethod, "method :#{meth} exists on both #{@binding.self.inspect} (outside) and #{@obj.inspect} (inside) #{ex.message}"
+        unless ::Object::RUBY_VERSION == '2.0.0'
+          # for some reason, any references to ex.message fail here for 2.0.0
+          # so only for other versions just double-check versions that it was in fact caused by __ambiguous_method__
+          # otherwise just raise whatever was missing.
+          ::Kernel.raise unless ex.message =~ /__ambiguous_method__/
+        end
+        ::Kernel.raise AmbiguousMethod, "method :#{meth} exists on both #{@binding.self.inspect} (outside) and #{@obj.inspect} (inside)", ex.backtrace[3..-1]
       end
     end
 

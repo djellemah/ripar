@@ -206,7 +206,7 @@ describe Ripar::Roller do
         end
       end
 
-      ->{collection.roller{ to_be_duplicated }}.should raise_error(Ripar::Combinder::AmbiguousMethod)
+      ->{collection.roller{ to_be_duplicated }}.should raise_error(Ripar::Roller::Undispatchable)
     end
 
     it 'handles nested rollers' do

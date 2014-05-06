@@ -30,7 +30,7 @@ describe Ripar::Combinder do
 
     it 'raise on ambiguous method' do
       combinder = Ripar::Combinder.new(an_object, binding)
-      ->{combinder.instance_eval{ oops }}.should raise_error(Ripar::Combinder::AmbiguousMethod, /exists on both/)
+      ->{combinder.instance_eval{ oops }}.should raise_error(Ripar::Combinder::AmbiguousMethod, /oops.*exists on both/)
     end
 
     it 'callback on ambiguous method' do
