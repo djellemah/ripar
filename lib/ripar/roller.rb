@@ -68,7 +68,7 @@ class Ripar::Roller < BasicObject
   # no point in using respond_to_missing?, because that's part of Object#respond_to,
   # not BasicObject
   def respond_to?( meth, include_all = false )
-    @riven.respond_to?(meth, include_all) || __methods__.include?(meth)
+    @riven.respond_to?(meth, include_all) || __methods__(include_all).include?(meth) || __singleton_methods__(include_all).include?(meth)
   end
 
   # make sure this BasicObject plays nicely in pry
@@ -85,6 +85,7 @@ class Ripar::Roller < BasicObject
   # include useful methods from Kernel, but rename
   define_method :__class__, ::Kernel.instance_method(:class)
   define_method :__object_id__, ::Kernel.instance_method(:object_id)
+  define_method :__singleton_methods__, ::Kernel.instance_method(:singleton_methods)
 
 protected
 
@@ -100,8 +101,7 @@ protected
   end
 
 private
-
-  def __methods__
-    self.__class__.instance_methods
+  def __methods__( include_all = true )
+    self.__class__.instance_methods include_all
   end
 end

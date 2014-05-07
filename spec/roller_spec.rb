@@ -267,4 +267,24 @@ describe Ripar::Roller do
       collection.roller.riven.object_id.should_not == collection.object_id
     end
   end
+
+  describe '#respond_to?' do
+    it 'forwarded methods' do
+      rlr = collection.roller
+      rlr.should respond_to(:to_a)
+    end
+
+    it 'Roller methods' do
+      rlr = collection.roller
+      rlr.should respond_to(:riven)
+    end
+
+    it 'singleton methods' do
+      rlr = collection.roller
+      class << rlr
+        def bergle; riven end
+      end
+      rlr.should respond_to(:bergle)
+    end
+  end
 end
